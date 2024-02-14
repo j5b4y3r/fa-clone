@@ -1,5 +1,5 @@
 import React, {Fragment, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import axios from "axios";
+//import axios from "axios";
 import { useSelector } from "react-redux";
 
 const SectionMain = (buttons) => {
@@ -16,7 +16,7 @@ const SectionMain = (buttons) => {
     const [classname, setClassname] = useState("compact");
     const [freeIcons, setFreeIcons] = useState([]);
     const [proIcons, setProIcons] = useState([]);
-    const [buttonId, setButtonId] = useState([]);
+    const [, setButtonId] = useState([]);
 
     const articleRef = useRef(null);
     const cpyPpRef = useRef([]);
@@ -36,7 +36,8 @@ const SectionMain = (buttons) => {
         }
     };
 
-    const fetchData = async () => {
+
+    /*const fetchData = async () => {
         try {
             const response = await axios.get('http://localhost:8008/api/data');
             setData(response.data[0]);
@@ -44,7 +45,7 @@ const SectionMain = (buttons) => {
         } catch (error) {
             console.error('Error fetching data:', error);
         }
-    };
+    };*/
 
     const goNext = () => {
         const totalLength = key ? searchResults.length : allIcons.length;
@@ -109,15 +110,15 @@ const SectionMain = (buttons) => {
                 }else if(article.classList.contains('cheatsheet')){
                     setClassname("cheatsheet");
                 }
-            }
+            }else if (key){}
         }finally {}
 
-    },[articleRef, key])
+    },[isDataLoaded, articleRef, key])
     //console.log(classname)
 
     useEffect(()=>{
         if(document.getElementById("free").classList.value.includes('underline')){
-            setButtonId((buttonId) => [...buttonId, 'free'])
+            setButtonId((buttonId) => [...buttonId, 'free']);
         }
     },[])
 
@@ -252,14 +253,14 @@ const SectionMain = (buttons) => {
                 // Update allIcons based on selected categories
                 const selectedIcons = Object.entries(data)
                     .filter(([category]) => selected.includes(category))
-                    .reduce((acc, [category, items]) => [...acc, ...items], []);
+                    .reduce((acc, [, items]) => [...acc, ...items], []);
                 setAllIcons(selectedIcons);
             } else {
                 // Fall back to all icons data
                 setAllIcons(allIconsData);
             }
         }
-    }, [isDataLoaded, buttons.buttons, selected, allIconsData]);
+    }, [isDataLoaded, buttons.buttons, selected, allIconsData, data]);
 
 
 
