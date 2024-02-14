@@ -22,8 +22,19 @@ const SectionMain = (buttons) => {
     const cpyPpRef = useRef([]);
 
     useEffect(() => {
-        fetchData();
+        //fetchData();
+        getData()
     }, []);
+
+    const getData = async () => {
+        try {
+            const response = await require("../assets/database/data.json");
+            setData(response);
+            setIsDataLoaded(true);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
 
     const fetchData = async () => {
         try {
@@ -236,7 +247,7 @@ const SectionMain = (buttons) => {
 
     useEffect(() => {
         if (isDataLoaded) {
-           
+
             if (selected.length > 0) {
                 // Update allIcons based on selected categories
                 const selectedIcons = Object.entries(data)

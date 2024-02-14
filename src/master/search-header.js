@@ -1,7 +1,7 @@
 import React, {memo, useEffect, useRef, useState} from 'react';
 import {useDispatch} from "react-redux";
 import {searchKey} from "../redux/state/searchSlice";
-import {click} from "@testing-library/user-event/dist/click";
+
 const SearchHeader = ({buttons}) => {
     const dispatch = useDispatch()
 

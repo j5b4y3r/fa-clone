@@ -805,6 +805,9 @@ button.icon span i{
   font-weight: bold;
   color: #09254a;
  }
+.croseBtn span i:hover{
+  color: red;
+}
 .popup-header{
   display: flex;
   flex-direction: row;
@@ -854,6 +857,8 @@ button.icon span i{
   height: fit-content;
   cursor: pointer;
   user-select: none;
+  flex-wrap: nowrap;
+  scroll-behavior: auto;
 }
 .popup-body-download-copy:hover{
   text-shadow: 2px 2px 2px 2px #0dcaf0;
