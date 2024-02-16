@@ -58,7 +58,7 @@ const SearchHeader = ({buttons}) => {
         dispatch(searchKey(e.target.value))
     }
     useEffect(()=>{
-        document.querySelectorAll('.feature-button').forEach(element => {element.click();});
+        document.querySelectorAll('.feature-button').forEach(element => {element.click();element.click();});
     },[])
 
     return (

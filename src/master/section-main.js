@@ -16,6 +16,7 @@ const SectionMain = (buttons) => {
     const [classname, setClassname] = useState("compact");
     const [freeIcons, setFreeIcons] = useState([]);
     const [proIcons, setProIcons] = useState([]);
+    const [isFreeButtonSelected, setIsFreeButtonSelected] = useState(false);
     const [, setButtonId] = useState([]);
 
     const articleRef = useRef(null);
@@ -48,7 +49,7 @@ const SectionMain = (buttons) => {
     };*/
 
     const goNext = () => {
-        const totalLength = key ? searchResults.length : allIcons.length;
+        const totalLength = isFreeButtonSelected?freeIcons.length: key ? searchResults.length : allIcons.length;
         if (end < totalLength) {
             setStart(end);
             setEnd(end + 50);
@@ -67,11 +68,18 @@ const SectionMain = (buttons) => {
     ), [data]);
 
     useEffect(() => {
-        const freeIcons = allIcons.filter((icon) => (icon.type === 'free'));
-        const proIcons = allIcons.filter((icon) => (icon.type === 'pro'));
-        setFreeIcons(freeIcons);
-        setProIcons(proIcons);
-    }, [allIcons]);
+        if (searchResults.length > 0) {
+            const freeIcons = searchResults.filter((icon) => (icon.type === 'free'));
+            const proIcons = searchResults.filter((icon) => (icon.type === 'pro'));
+            setFreeIcons(freeIcons);
+            setProIcons(proIcons);
+        }else{
+            const freeIcons = allIcons.filter((icon) => (icon.type === 'free'));
+            const proIcons = allIcons.filter((icon) => (icon.type === 'pro'));
+            setFreeIcons(freeIcons);
+            setProIcons(proIcons);
+        }
+    }, [allIcons, searchResults]);
 
     const goPrev = () => {
         if (start >= 50) {
@@ -94,6 +102,8 @@ const SectionMain = (buttons) => {
         if (allIcons && key !== '') {
             const results = searchData(allIcons, key);
             setSearchResults(results);
+            setStart(0)
+            setEnd(50)
             setPageNo(1); // Reset page number when performing a new search
         }else {setSearchResults([])}
     }, [allIcons, key, searchData]);
@@ -124,12 +134,13 @@ const SectionMain = (buttons) => {
 
 
     const renderIcon = useMemo(() => {
+        let iconsToRender;
         if (!isDataLoaded || !data) {
             return null; // Return early if data is not yet loaded
         }
-
-        // Filter icons based on search query
-        const iconsToRender = key || searchResults.length > 0? searchResults : allIcons;
+        
+        if (isFreeButtonSelected){iconsToRender = freeIcons;}
+        else{iconsToRender = key || searchResults.length > 0? searchResults : allIcons;}
 
         // Slice icons based on pagination
         const iconsOnPage = iconsToRender.slice(start, end);
@@ -200,7 +211,7 @@ const SectionMain = (buttons) => {
 
         // Render the icons
         return iconsOnPage.map((item, i) => (
-            <div>
+            <div key={i}>
                 {copyPopUp(item, i)}
                 <article onClick={() => showCpyPp(i)} ref={articleRef} key={i} id={item.name}
                          className={`wrap-icon ${classname} with-top-tag`}>
@@ -214,12 +225,12 @@ const SectionMain = (buttons) => {
                 </article>
             </div>
         ));
-    }, [isDataLoaded, data, key, searchResults, allIcons, start, end, classname]);
+    }, [isDataLoaded, data, isFreeButtonSelected, start, end, freeIcons, key, searchResults, allIcons, classname]);
 
     const maxPages = useMemo(() => {
-        const totalLength = key || searchResults.length > 0 ? searchResults.length : allIcons.length;
+        const totalLength = isFreeButtonSelected?freeIcons.length : key || searchResults.length > 0 ? searchResults.length : allIcons.length;
         return Math.ceil(totalLength / 50);
-    }, [allIcons, searchResults, key]);
+    }, [allIcons.length, freeIcons.length, isFreeButtonSelected, key, searchResults.length]);
 
 
     //filtering ------------------------------------
@@ -240,11 +251,11 @@ const SectionMain = (buttons) => {
 
         // Update allIcons based on the "free" button selection
         if (isFreeButtonSelected) {
-            setSearchResults(freeIcons);
+            setIsFreeButtonSelected(true);
         }else{
-            setSearchResults(proIcons)
+            setIsFreeButtonSelected(false);
         }
-    },[freeIcons, proIcons,buttons.buttons, selected, allIconsData])
+    },[buttons.buttons])
 
     useEffect(() => {
         if (isDataLoaded) {
@@ -255,9 +266,15 @@ const SectionMain = (buttons) => {
                     .filter(([category]) => selected.includes(category))
                     .reduce((acc, [, items]) => [...acc, ...items], []);
                 setAllIcons(selectedIcons);
+                setStart(0)
+                setEnd(50)
+                setPageNo(1)
             } else {
                 // Fall back to all icons data
                 setAllIcons(allIconsData);
+                setStart(0)
+                setEnd(50)
+                setPageNo(1)
             }
         }
     }, [isDataLoaded, buttons.buttons, selected, allIconsData, data]);
@@ -342,7 +359,11 @@ const SectionMain = (buttons) => {
                                 <div className="wrap-state w-100 pt-2">
                                     <div className="row justify-content-between pr-4 pl-4">
                                         <div className="icon-number">
-                                            <span>{key !== '' || searchResults.length > 0? searchResults.length : allIcons.length} Icons</span>
+                                            {isFreeButtonSelected ? (
+                                                <span>{freeIcons.length} Icons</span>
+                                            ):(
+                                                <span>{key !== '' || searchResults.length > 0 ? searchResults.length : allIcons.length} Icons</span>
+                                            )}
                                         </div>
                                         <div className="page-number">
                                             <span>Page {pageNo} of {maxPages !== 0 ? maxPages : 1}</span>
